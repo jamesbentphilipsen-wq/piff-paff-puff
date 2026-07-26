@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piff-Paff-Puff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#182019; --paper:#F4EFE3; --bottle:#274A38; --bottle-dark:#173226;
+    --amber:#A5622E; --amber-light:#D98F52; --fjord:#33627A; --line:#C9BFA6;
+    --white:#FFFDF8; --danger:#A23B2E; --ok:#3E7A4C; --gold:#C99A3B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-0.01em;color:var(--bottle-dark);margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .app{max-width:1000px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+  header.top{background:var(--bottle-dark);color:var(--white);padding:18px 20px 0 20px;position:sticky;top:0;z-index:30;}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .brand .mark{width:36px;height:36px;border-radius:9px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;color:var(--bottle-dark);font-size:16px;}
+  .brand-text{display:flex;flex-direction:column;line-height:1.1;}
+  .brand-text b{font-family:'Fraunces',serif;font-size:18px;font-weight:600;}
+  .brand-text span{font-size:10.5px;opacity:.65;letter-spacing:.04em;}
+  nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+  nav::-webkit-scrollbar{display:none;}
+  nav button{background:none;border:none;color:var(--white);opacity:.55;font-family:'Inter';font-size:12.8px;font-weight:600;letter-spacing:.01em;padding:11px 12px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;}
+  nav button.active{opacity:1;border-bottom:2px solid var(--amber-light);}
+  main{flex:1;padding:24px 18px 60px 18px;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:22px;margin-bottom:18px;}
+  .card.dark{background:var(--bottle-dark);color:var(--white);border:none;}
+  .card.dark h2, .card.dark h3, .card.dark .display{color:var(--white);}
+  .card.dark p{color:#D9E3D8;}
+  .eyebrow{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;display:block;}
+  .card.dark .eyebrow{color:var(--amber-light);}
+  p{line-height:1.6;color:#3a3f39;}
+  .card.dark p.body{color:#D9E3D8;}
+  label{display:block;font-size:12.5px;font-weight:600;margin:14px 0 5px 0;color:var(--bottle-dark);}
+  input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;font-family:'Inter';font-size:14.5px;background:var(--paper);color:var(--ink);}
+  textarea{resize:vertical;}
+  input:focus,select:focus,button:focus-visible,textarea:focus{outline:2px solid var(--fjord);outline-offset:1px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  @media (max-width:640px){.row2,.row3{grid-template-columns:1fr;}}
+  .btn{margin-top:18px;background:var(--bottle-dark);color:var(--white);border:none;padding:12px 20px;border-radius:3px;font-family:'Inter';font-weight:600;font-size:13.5px;cursor:pointer;letter-spacing:.01em;}
+  .btn:hover{background:var(--bottle);}
+  .btn.secondary{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+  .btn.secondary:hover{background:var(--danger);color:var(--white);}
+  .btn.ghost{background:transparent;color:var(--bottle-dark);border:1px solid var(--line);}
+  .btn.amber{background:var(--amber);}
+  .btn.amber:hover{background:var(--amber-light);}
+  .btn.small{padding:6px 12px;font-size:11.5px;margin:0;}
+  .msg{margin-top:14px;padding:10px 14px;border-radius:3px;font-size:13.5px;}
+  .msg.ok{background:#E5F0E6;color:var(--ok);border:1px solid #bcd9c0;}
+  .msg.err{background:#F5E6E2;color:var(--danger);border:1px solid #e3b7ab;}
+  .msg.info{background:#E7EEF1;color:var(--fjord);border:1px solid #b9cfd6;}
+  .receipt{background:var(--white);border:1px dashed var(--bottle);padding:20px;font-family:'IBM Plex Mono';font-size:12.5px;color:var(--bottle-dark);position:relative;margin-top:16px;border-radius:2px;}
+  .receipt::before,.receipt::after{content:"";position:absolute;width:16px;height:16px;background:var(--paper);border-radius:50%;top:-9px;}
+  .receipt::before{left:-9px;} .receipt::after{right:-9px;}
+  .receipt h3{font-family:'IBM Plex Mono';font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;border-bottom:1px dashed var(--line);padding-bottom:10px;}
+  .receipt .line{display:flex;justify-content:space-between;padding:3px 0;gap:10px;}
+  .receipt .line b{font-weight:600;text-align:right;}
+  .receipt .num{font-size:20px;font-weight:600;text-align:center;margin:12px 0;letter-spacing:.05em;}
+  .regions{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:6px;}
+  .region-tile{border:1px solid var(--line);border-radius:4px;padding:13px;background:var(--white);border-left:4px solid var(--fjord);cursor:default;}
+  .region-tile.hq{border-left-color:var(--gold);}
+  .region-tile .grp{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#7a7566;font-family:'IBM Plex Mono';display:flex;justify-content:space-between;}
+  .region-tile .name{font-family:'Fraunces',serif;font-size:15px;margin:4px 0 8px 0;color:var(--bottle-dark);}
+  .region-tile .count{font-family:'IBM Plex Mono';font-size:23px;font-weight:600;color:var(--amber);}
+  .region-tile .count span{font-size:11px;color:#7a7566;font-weight:400;margin-left:4px;}
+  .hqtag{background:var(--gold);color:var(--white);font-size:9px;padding:1px 6px;border-radius:8px;font-family:'IBM Plex Mono';}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:#7a7566;padding:8px 9px;border-bottom:1px solid var(--line);}
+  td{padding:9px 9px;border-bottom:1px solid #EFE9DA;}
+  tr:hover td{background:#FBF8F0;}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-family:'IBM Plex Mono';}
+  .pill.active{background:#E5F0E6;color:var(--ok);}
+  .pill.inactive{background:#EFE9DA;color:#7a7566;}
+  .pill.pending{background:#FBEBD8;color:var(--amber);}
+  .gate{max-width:340px;margin:50px auto;text-align:center;}
+  .locked-note{font-size:11.5px;color:#7a7566;margin-top:10px;}
+  .subnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+  .subnav button{background:var(--white);border:1px solid var(--line);padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--bottle-dark);}
+  .subnav button.active{background:var(--bottle-dark);color:var(--white);border-color:var(--bottle-dark);}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .stat{flex:1;min-width:135px;background:var(--white);border:1px solid var(--line);border-radius:4px;padding:15px;}
+  .stat.dark{background:var(--bottle-dark);border:none;}
+  .stat .n{font-family:'IBM Plex Mono';font-size:22px;font-weight:600;color:var(--bottle-dark);}
+  .stat.dark .n{color:var(--white);}
+  .stat .l{font-size:11px;color:#7a7566;letter-spacing:.03em;margin-top:2px;}
+  .stat.dark .l{color:#B9C8B7;}
+  .loglist{max-height:300px;overflow-y:auto;}
+  .logitem{padding:10px 0;border-bottom:1px solid #EFE9DA;font-size:12.5px;}
+  .logitem .to{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--fjord);}
+  footer.site{background:var(--bottle-dark);color:#D9E3D8;padding:30px 18px;margin-top:auto;}
+  footer.site h3{color:var(--white);font-size:15px;margin-bottom:8px;}
+  footer.site a{color:#D9E3D8;}
+  .foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px;max-width:1000px;margin:0 auto;font-size:12.5px;line-height:1.9;}
+  .foot-bottom{text-align:center;font-size:11px;color:#8CA090;padding-top:20px;margin-top:20px;border-top:1px solid #2C4C3A;max-width:1000px;margin-left:auto;margin-right:auto;}
+  .options-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:6px;}
+  .opt-label{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:4px;padding:10px 12px;font-size:13px;cursor:pointer;background:var(--white);}
+  .opt-label input{width:auto;margin:0;}
+  .bar-row{margin-bottom:12px;}
+  .bar-row .head{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;}
+  .bar-row .head b{color:var(--white);}
+  .bar-track{height:7px;background:#2C4C3A;border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,#3E9463,#7DD9A5);}
+  .qr-box{display:flex;gap:16px;flex-wrap:wrap;}
+  .qr-item{text-align:center;background:var(--white);border:1px solid var(--line);border-radius:5px;padding:14px;flex:1;min-width:170px;}
+  .qr-item img{width:150px;height:150px;}
+  .qr-item .cap{font-size:11.5px;color:#7a7566;margin-top:8px;}
+  .tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .tile{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:15px 12px;cursor:pointer;text-align:left;}
+  .tile:hover{border-color:var(--fjord);}
+  .tile .n{font-family:'IBM Plex Mono';font-size:11px;color:var(--amber);}
+  .tile .t{font-family:'Fraunces',serif;font-size:14.5px;margin-top:4px;color:var(--bottle-dark);line-height:1.25;}
+  .badge-org{display:inline-block;font-family:'IBM Plex Mono';font-size:10px;padding:2px 8px;border-radius:10px;letter-spacing:.03em;}
+  .badge-org.ppp{background:#E5F0E6;color:var(--ok);}
+  .badge-org.hb{background:#FBEBD8;color:var(--amber);}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ---------- Region logic ---------- */
+function getRegion(pcRaw){
+  const pc = parseInt(pcRaw,10);
+  if(isNaN(pc) || pc<1000 || pc>9999) return null;
+  if(pc>=1000 && pc<=2999) return {group:"Storby", name:"København", hq:false};
+  if(pc>=3000 && pc<=3699) return {group:"Sjælland", name:"Sjælland – Nord", hq:false};
+  if(pc>=4000 && pc<=4499) return {group:"Sjælland", name:"Sjælland – Vest", hq:false};
+  if(pc>=4500 && pc<=4999) return {group:"Sjælland", name:"Sjælland – Syd", hq:false};
+  if(pc>=5000 && pc<=5270) return {group:"Storby", name:"Odense", hq:false};
+  if(pc>=5271 && pc<=5999) return {group:"Fyn", name:"Fyn (Hovedafdeling)", hq:true};
+  if(pc>=6000 && pc<=7300) return {group:"Jylland", name:"Jylland – Syd", hq:false};
+  if(pc>=7400 && pc<=7999) return {group:"Jylland", name:"Jylland – Midt", hq:false};
+  if(pc>=8000 && pc<=8270) return {group:"Storby", name:"Aarhus", hq:false};
+  if(pc>=8271 && pc<=8999) return {group:"Jylland", name:"Jylland – Midt", hq:false};
+  if(pc>=9000 && pc<=9220) return {group:"Storby", name:"Aalborg", hq:false};
+  if(pc>=9221 && pc<=9999) return {group:"Jylland", name:"Jylland – Nord", hq:false};
+  return null;
+}
+const ALL_REGIONS = [
+  {group:"Storby", name:"København", pc:"1000–2999"},
+  {group:"Storby", name:"Odense", pc:"5000–5270"},
+  {group:"Storby", name:"Aarhus", pc:"8000–8270"},
+  {group:"Storby", name:"Aalborg", pc:"9000–9220"},
+  {group:"Fyn", name:"Fyn (Hovedafdeling)", pc:"5271–5999", hq:true},
+  {group:"Sjælland", name:"Sjælland – Nord", pc:"3000–3699"},
+  {group:"Sjælland", name:"Sjælland – Vest", pc:"4000–4499"},
+  {group:"Sjælland", name:"Sjælland – Syd", pc:"4500–4999"},
+  {group:"Jylland", name:"Jylland – Syd", pc:"6000–7300"},
+  {group:"Jylland", name:"Jylland – Midt", pc:"7400–8999"},
+  {group:"Jylland", name:"Jylland – Nord", pc:"9221–9999"},
+];
+function regionCode(name){
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z]/g,"").slice(0,3).toUpperCase();
+}
+const CONTAINER_TYPES = [
+  ["privat","Privat husstand","En enkelt husstand"],
+  ["nabo","Naboordning","Deles mellem flere naboer"],
+  ["klub","Klub / forening","Sports- eller fritidsklub"],
+  ["skole","Skole / SFO","Skole, gymnasium eller SFO"],
+  ["institution","Institution","Børnehave, plejehjem mv."],
+  ["andet","Andet fællesskab","Et andet godt formål"],
+];
+
+/* ---------- Storage helpers (shared — public pilot data) ---------- */
+const SKEY = {
+  members:"members", contacts:"region-contacts", calendar:"calendar-events",
+  collections:"collections", log:"message-log", seq:"member-seq",
+  fullreports:"full-haste-reports", settings:"org-settings"
+};
+async function sget(key, fallback){
+  try{ const r = await window.storage.get(key, true); return r ? JSON.parse(r.value) : fallback; }
+  catch(e){ return fallback; }
+}
+async function sset(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); }catch(e){ console.error("storage error",e); }
+}
+
+let state = {
+  tab:"forside", beholderSub:"tilmeld", adminSub:"oversigt",
+  members:[], contacts:{}, calendar:[], collections:[], log:[], seq:0, fullreports:[],
+  settings:{
+    ppp:{name:"Piff-Paff-Puff", cvr:"", phone:"0045 35951028", email:"jp@piff-paff-puff.dk", website:"https://www.piff-paff-puff.dk/", facebook:"https://www.facebook.com/share/1959LLuBi2/?mibextid=wwXIfr"},
+    haabet:{name:"Håbet", cvr:"46479807", phone:"0045 35951026", email:"jp@haabeet.dk", website:"https://www.haabeet.dk/"}
+  },
+  adminUnlocked:false, loaded:false,
+};
+
+async function loadAll(){
+  state.members = await sget(SKEY.members, []);
+  state.contacts = await sget(SKEY.contacts, Object.fromEntries(ALL_REGIONS.map(r=>[r.name,""])));
+  state.calendar = await sget(SKEY.calendar, []);
+  state.collections = await sget(SKEY.collections, []);
+  state.log = await sget(SKEY.log, []);
+  state.seq = await sget(SKEY.seq, 0);
+  state.fullreports = await sget(SKEY.fullreports, []);
+  state.settings = await sget(SKEY.settings, state.settings);
+  state.loaded = true;
+  render();
+}
+function uid(){ return Math.random().toString(36).slice(2,9); }
+async function addLog(to, subject, body){
+  const entry = {id:uid(), to, subject, body, date:new Date().toISOString()};
+  state.log.unshift(entry);
+  await sset(SKEY.log, state.log);
+}
+async function nextMemberNumber(regionName){
+  state.seq += 1;
+  await sset(SKEY.seq, state.seq);
+  return regionCode(regionName) + "-" + String(state.seq).padStart(5,"0");
+}
+function findMember(lookup){
+  const q = (lookup||"").trim().toLowerCase();
+  return state.members.find(m => m.number.toLowerCase()===q || m.email.toLowerCase()===q);
+}
+
+/* ---------- Render shell ---------- */
+const root = document.getElementById("app");
+function setTab(t){ state.tab=t; render(); window.scrollTo(0,0); }
+
+function render(){
+  if(!state.loaded){ root.innerHTML = `<div style="padding:60px;text-align:center;color:#7a7566;">Indlæser…</div>`; return; }
+  root.innerHTML = `${headerHTML()}<main>${bodyHTML()}</main>${footerHTML()}`;
+  bindEvents();
+}
+
+function headerHTML(){
+  const tabs = [
+    ["forside","Forside"],["beholder","Beholder"],["kalender","Kalender"],
+    ["maerket","Mærket"],["om","Om os"],["kontakt","Kontakt"],
+    ["indsamling","Indsamling"],["admin","Admin"],
+  ];
+  return `
+  <header class="top">
+    <div class="brand">
+      <div class="mark">♻</div>
+      <div class="brand-text"><b>Piff-Paff-Puff</b><span>PANTDONATION · HELE DANMARK · PILOT: FYN</span></div>
+    </div>
+    <nav>${tabs.map(([id,l])=>`<button data-tab="${id}" class="${state.tab===id?'active':''}">${l}</button>`).join("")}</nav>
+  </header>`;
+}
+
+function footerHTML(){
+  const p = state.settings.ppp, h = state.settings.haabet;
+  return `
+  <footer class="site">
+    <div class="foot-grid">
+      <div>
+        <h3>Piff-Paff-Puff</h3>
+        <p style="color:#B9C8B7;font-size:12px;">Indsamler pantdonationer i hele Danmark. Pengene går videre til Håbet.</p>
+        📞 ${p.phone}<br>✉️ <a href="mailto:${p.email}">${p.email}</a><br>🔗 <a href="${p.website}" target="_blank">${p.website.replace('https://','')}</a><br>
+        📘 <a href="${p.facebook}" target="_blank">Facebook</a>
+      </div>
+      <div>
+        <h3>Håbet</h3>
+        <p style="color:#B9C8B7;font-size:12px;">Den sociale organisation som pantmidlerne går til.</p>
+        CVR ${h.cvr}<br>📞 ${h.phone}<br>✉️ <a href="mailto:${h.email}">${h.email}</a><br>🔗 <a href="${h.website}" target="_blank">${h.website.replace('https://','')}</a>
+      </div>
+      <div>
+        <h3>Hurtige links</h3>
+        <a href="#" data-tab="beholder">Tilmeld beholder</a><br>
+        <a href="#" data-tab="kalender">Tømningskalender</a><br>
+        <a href="#" data-tab="kontakt">Kontaktpersoner</a><br>
+        <a href="#" data-tab="indsamling">Indsamlingsstatus</a><br>
+        <a href="#" data-tab="om">Formål &amp; vision</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 Piff-Paff-Puff — et projekt under Håbet · Prototype under test, pilotområde Fyn · Ikke koblet til rigtig mailudsendelse endnu</div>
+  </footer>`;
+}
+
+function bodyHTML(){
+  if(state.tab==="forside") return forsideHTML();
+  if(state.tab==="beholder") return beholderHTML();
+  if(state.tab==="kalender") return kalenderHTML();
+  if(state.tab==="maerket") return maerketHTML();
+  if(state.tab==="om") return omHTML();
+  if(state.tab==="kontakt") return kontaktHTML();
+  if(state.tab==="indsamling") return indsamlingHTML();
+  if(state.tab==="admin") return state.adminUnlocked ? adminHTML() : gateHTML();
+  return "";
+}
+
+/* ---------- FORSIDE ---------- */
+function forsideHTML(){
+  const active = state.members.filter(m=>m.status==="active").length;
+  const total = state.collections.reduce((s,c)=>s+Number(c.amount||0),0);
+  const shortcuts = [
+    ["kalender","1 · Tømningskalender pr. område","Se faste tømmedage for dit område"],
+    ["beholder:tilmeld","2 · Tilmelding","Tilmeld din husstand, klub eller institution"],
+    ["beholder:opslag","3 · Min beholder","Slå op, se tømning, flyt adresse"],
+    ["kalender","4 · Tømningskalender for områder","Overblik over hele landet"],
+    ["maerket","5 · Mærket","Se Håbet-mærket og bliv mærkebærer"],
+    ["kontakt","6 · Kontakt","Find kontaktperson og telefonmenu"],
+    ["indsamling","7 · Indsamling","Samlet beløb og antal brugere"],
+    ["beholder:tilmeld","8 · Opskrivning til beholder","Få udleveret medlemsnr. i dit område"],
+    ["beholder:bestilnr","9 · Bestil bruger-nr uden beholder","Brug egen opbevaring / sække"],
+  ];
+  return `
+  <div class="card dark">
+    <span class="eyebrow">Velkommen til</span>
+    <h1 style="font-size:26px;margin-bottom:10px;color:var(--white);">Doner din flaskepant — det gør en forskel</h1>
+    <p class="body">Piff-Paff-Puff indsamler pantdonationer på tværs af hele Danmark. Overskuddet går videre til Håbet, som bruger det på social velfærd og trivsel — akutboliger, vejledning og en hånd at holde i, når livet er svært.</p>
+    <div class="stat-row" style="margin-top:16px;">
+      <div class="stat dark"><div class="n">${active}</div><div class="l">AKTIVE MEDLEMMER</div></div>
+      <div class="stat dark"><div class="n">${ALL_REGIONS.length}</div><div class="l">OMRÅDER I DANMARK</div></div>
+      <div class="stat dark"><div class="n">${total.toLocaleString('da-DK')} kr</div><div class="l">INDSAMLET I ALT</div></div>
+    </div>
+    <button class="btn amber" data-tab="beholder">Tilmeld dig nu</button>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Genveje</span>
+    <h2 style="font-size:19px;margin-bottom:12px;">Alt du kan gøre i appen</h2>
+    <div class="tile-grid">
+      ${shortcuts.map(([target,title,desc])=>`<button class="tile" data-shortcut="${target}"><div class="n">${title.split(' · ')[0]}</div><div class="t">${title.split(' · ')[1]}</div><div style="font-size:11.5px;color:#7a7566;margin-top:4px;">${desc}</div></button>`).join("")}
+    </div>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Om projektet</span>
+    <p>Piff-Paff-Puff er nu fysisk klar til drift. Projektet bygges — én sætning ad gangen — med hjælp fra danske borgere, der tilmelder sig. Det er en <b>projektvision under opbygning</b>: målet er, at driften af både Piff-Paff-Puff og Håbet på sigt overdrages til borgerne i de enkelte områder, så hvert område selv ejer og driver sin del. <a href="#" data-tab="om">Læs hele formålet →</a></p>
+  </div>`;
+}
+
+/* ---------- BEHOLDER (tilmeld/afmeld/opslag/adresse/fuld/bestilnr) ---------- */
+function beholderHTML(){
+  const sub = state.beholderSub;
+  const subs = [["tilmeld","Tilmeld"],["afmeld","Afmeld"],["opslag","Min beholder"],["adresse","Adresseændring"],["fuldhaste","Meld fuld / Haste"],["bestilnr","Bestil nr. uden beholder"]];
+  return `
+  <div class="subnav">${subs.map(([id,l])=>`<button data-bsub="${id}" class="${sub===id?'active':''}">${l}</button>`).join("")}</div>
+  ${sub==="tilmeld" ? tilmeldHTML() : ""}
+  ${sub==="afmeld" ? afmeldHTML() : ""}
+  ${sub==="opslag" ? opslagHTML() : ""}
+  ${sub==="adresse" ? adresseHTML() : ""}
+  ${sub==="fuldhaste" ? fuldHasteHTML() : ""}
+  ${sub==="bestilnr" ? bestilNrHTML() : ""}
+  `;
+}
+
+function containerTypeOptions(prefix){
+  return CONTAINER_TYPES.map(([id,label,desc],i)=>`
+    <label class="opt-label"><input type="radio" name="${prefix}" value="${id}" ${i===0?"checked":""}/> <span><b>${label}</b><br><span style="font-size:11px;color:#7a7566;">${desc}</span></span></label>
+  `).join("");
+}
+
+function tilmeldHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Tilmelding</span>
+    <h2 style="font-size:21px;">Tilmeld en beholder eller opskriv dig</h2>
+    <p>Udfyld adressen — vi finder automatisk dit område og udleverer et medlemsnummer.</p>
+    <form id="signup-form">
+      <label>Hvilken type tilmelder du?</label>
+      <div class="options-grid">${containerTypeOptions("ctype")}</div>
+      <label>Opbevaringsform</label>
+      <div class="row2">
+        <label class="opt-label"><input type="radio" name="storage" value="beholder" checked/> Fysisk beholder leveres</label>
+        <label class="opt-label"><input type="radio" name="storage" value="egen"/> Egen opbevaring (sække sættes ved vejen på tømningsdag)</label>
+      </div>
+      <div class="row2">
+        <div><label>Kontaktperson / fulde navn</label><input required name="name" placeholder="Anna Jensen"/></div>
+        <div><label>Telefon</label><input required name="phone" placeholder="12 34 56 78"/></div>
+      </div>
+      <label>E-mail</label><input required type="email" name="email" placeholder="anna@eksempel.dk"/>
+      <div class="row2">
+        <div><label>Vejnavn og husnummer</label><input required name="street" placeholder="Vestergade 12"/></div>
+        <div><label>Postnummer</label><input required name="postal" maxlength="4" placeholder="5000"/></div>
+      </div>
+      <label>By</label><input required name="city" placeholder="Odense"/>
+      <div id="region-preview" style="margin-top:12px;font-size:13px;color:#7a7566;"></div>
+      <button class="btn" type="submit">Tilmeld og få medlemsnummer</button>
+    </form>
+    <div id="signup-result"></div>
+  </div>`;
+}
+function afmeldHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Afmelding</span>
+    <h2 style="font-size:21px;">Afmeld din beholder</h2>
+    <p>Indtast dit medlemsnummer eller den e-mail du tilmeldte dig med.</p>
+    <form id="cancel-form">
+      <label>Medlemsnummer eller e-mail</label>
+      <input required name="lookup" placeholder="FYN-00001 eller anna@eksempel.dk"/>
+      <button class="btn secondary" type="submit">Afmeld</button>
+    </form>
+    <div id="cancel-result"></div>
+  </div>`;
+}
+function opslagHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Min beholder</span>
+    <h2 style="font-size:21px;">Slå din beholder op</h2>
+    <p>Se dit medlemsnummer, område, status og opbevaringsform.</p>
+    <form id="lookup-form">
+      <label>Medlemsnummer eller e-mail</label>
+      <input required name="lookup" placeholder="FYN-00001 eller anna@eksempel.dk"/>
+      <button class="btn ghost" type="submit">Slå op</button>
+    </form>
+    <div id="lookup-result"></div>
+  </div>`;
+}
+function adresseHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Adresseændring</span>
+    <h2 style="font-size:21px;">Flyt din beholder til en ny adresse</h2>
+    <p>Området genberegnes automatisk ud fra det nye postnummer.</p>
+    <form id="move-form">
+      <label>Medlemsnummer eller e-mail</label><input required name="lookup" placeholder="FYN-00001 eller anna@eksempel.dk"/>
+      <div class="row2">
+        <div><label>Ny vej og husnummer</label><input required name="street" placeholder="Nygade 4"/></div>
+        <div><label>Nyt postnummer</label><input required name="postal" maxlength="4" placeholder="5100"/></div>
+      </div>
+      <label>Ny by</label><input required name="city" placeholder="Odense"/>
+      <button class="btn ghost" type="submit">Opdatér adresse</button>
+    </form>
+    <div id="move-result"></div>
+  </div>`;
+}
+function fuldHasteHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Beholder fuld</span>
+    <h2 style="font-size:21px;">Meld beholder fuld / bestil hasteafhentning</h2>
+    <p>Meld kun din beholder fuld når den faktisk er det — så bruger vi kun ressourcer på afhentning når det er nødvendigt. Faste tømningsdage klares automatisk. Ønsker du afhentning hurtigst muligt, kan du bestille hasteafhentning — den hentes så inden for maks. 3 dage.</p>
+    <form id="full-form">
+      <label>Medlemsnummer eller e-mail</label><input required name="lookup" placeholder="FYN-00001 eller anna@eksempel.dk"/>
+      <label>Note (valgfri)</label><input name="note" placeholder="fx: fyldt til randen, sække klar ved vejen"/>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" type="submit" data-kind="full">Meld beholder fuld</button>
+        <button class="btn amber" type="submit" data-kind="haste">Bestil hasteafhentning (maks. 3 dage)</button>
+      </div>
+    </form>
+    <div id="full-result"></div>
+  </div>`;
+}
+function bestilNrHTML(){
+  return `
+  <div class="card">
+    <span class="eyebrow">Uden fysisk beholder</span>
+    <h2 style="font-size:21px;">Bestil bruger-/medlemsnummer uden beholder</h2>
+    <p>Vil du hellere bruge egen opbevaring og selv sætte sække ved vejen på tømningsdagen? Så kan du få et bruger-/medlemsnummer uden at få en fysisk beholder leveret.</p>
+    <form id="nonr-form">
+      <div class="row2">
+        <div><label>Fulde navn</label><input required name="name" placeholder="Anna Jensen"/></div>
+        <div><label>Telefon</label><input required name="phone" placeholder="12 34 56 78"/></div>
+      </div>
+      <label>E-mail</label><input required type="email" name="email" placeholder="anna@eksempel.dk"/>
+      <div class="row2">
+        <div><label>Vejnavn og husnummer</label><input required name="street" placeholder="Vestergade 12"/></div>
+        <div><label>Postnummer</label><input required name="postal" maxlength="4" placeholder="5000"/></div>
+      </div>
+      <label>By</label><input required name="city" placeholder="Odense"/>
+      <button class="btn" type="submit">Bestil nummer</button>
+    </form>
+    <div id="nonr-result"></div>
+  </div>`;
+}
+
+/* ---------- KALENDER ---------- */
+function kalenderHTML(){
+  const regionFilter = state.calFilter || "";
+  const events = [...state.calendar].filter(e=> !regionFilter || e.region===regionFilter).sort((a,b)=> new Date(a.date)-new Date(b.date));
+  return `
+  <div class="card">
+    <span class="eyebrow">Tømningskalender</span>
+    <h2 style="font-size:21px;margin-bottom:10px;">Faste tømningsdage pr. område</h2>
+    <label>Vælg område</label>
+    <select id="cal-region-filter">
+      <option value="">Alle områder</option>
+      ${ALL_REGIONS.map(r=>`<option value="${r.name}" ${regionFilter===r.name?"selected":""}>${r.name} (${r.pc})</option>`).join("")}
+    </select>
+    <div style="margin-top:16px;">
+      <table>
+        <thead><tr><th>Dato</th><th>Område</th><th>Note</th></tr></thead>
+        <tbody>
+        ${events.map(e=>`<tr><td class="mono">${new Date(e.date).toLocaleDateString('da-DK')}</td><td>${e.region}</td><td>${e.note||"—"}</td></tr>`).join("") || `<tr><td colspan="3" style="color:#7a7566;">Ingen planlagte datoer endnu for dette valg.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Områdeoversigt</span>
+    <div class="regions">
+      ${ALL_REGIONS.map(r=>{
+        const c = state.members.filter(m=>m.region===r.name && m.status==="active").length;
+        return `<div class="region-tile ${r.hq?'hq':''}"><div class="grp"><span>${r.group}</span>${r.hq?'<span class="hqtag">HQ</span>':''}</div><div class="name">${r.name}</div><div style="font-size:11px;color:#7a7566;margin-bottom:6px;">Postnr. ${r.pc}</div><div class="count">${c}<span>medlemmer</span></div></div>`;
+      }).join("")}
+    </div>
+  </div>`;
+}
+
+/* ---------- MÆRKET ---------- */
+function maerketHTML(){
+  return `
+  <div class="card dark">
+    <span class="eyebrow">Et anerkendelsesmærke</span>
+    <h1 style="color:var(--white);font-size:26px;">Mærket der tildeles dem der gør en forskel</h1>
+    <p class="body">Håbet-mærket er en anerkendelse til alle der bidrager til fællesskabet gennem Piff-Paff-Puff — private, naboordninger, klubber, skoler og institutioner. Alle der ser donationsbeholderen som en god idé.</p>
+    <p class="body">Tildelingen følger med tilmeldingen og forpligter mærkebæreren til at passe på sin beholder, hjælpe sin nabo, og dele formålet videre.</p>
+  </div>
+  <div class="regions">
+    <div class="region-tile"><div class="name">🌱 Miljø</div><p style="font-size:12.5px;margin:0;">Beholderne sikrer at pant og genbrugelige effekter ikke ender som affald.</p></div>
+    <div class="region-tile"><div class="name">🤝 Samfund</div><p style="font-size:12.5px;margin:0;">Overskuddet går til Håbets sociale formål — administreret fra hovedafdelingen på Fyn.</p></div>
+    <div class="region-tile"><div class="name">👥 De udsatte</div><p style="font-size:12.5px;margin:0;">Vi hjælper mennesker i akut nød gennem direkte støtte og akutboliger.</p></div>
+    <div class="region-tile"><div class="name">🛡️ Tillid</div><p style="font-size:12.5px;margin:0;">Mærket er kun til dem der lever op til Piff-Paff-Puff og Håbets værdier.</p></div>
+  </div>
+  <div class="card" style="text-align:center;">
+    <button class="btn" data-tab="beholder">Bliv mærkebærer</button>
+    <button class="btn ghost" data-tab="om">Læs mere om Håbet</button>
+  </div>`;
+}
+
+/* ---------- OM OS / FORMÅL ---------- */
+function omHTML(){
+  const h = state.settings.haabet, p = state.settings.ppp;
+  return `
+  <div class="card">
+    <span class="eyebrow">Formål &amp; vision</span>
+    <h2 style="font-size:22px;">Hvorfor Piff-Paff-Puff findes</h2>
+    <p>Piff-Paff-Puff er indsamlingsmotoren: vi indsamler pantdonationer i alle Danmarks områder, helt gratis for donorerne. Ingen beholder koster noget at få stillet op. Pantet veksles hos Dansk Retursystem, som overfører pengene videre til os.</p>
+    <p>Pantindsamlingen fra alle områder går til <b>social velfærd og trivsel</b> — bredt, på rigtig mange områder og med mange forskellige hensigter, alt sammen under den sociale organisation Håbet.</p>
+    <p><b>Dette er et projekt i vision.</b> Det bygges, én sætning ad gangen, med hjælp fra danske borgere, efterhånden som flere tilmelder sig. Piff-Paff-Puff er nu fysisk klar til drift — det er selve appen, der er det sidste stykke af puslespillet. Vores drøm er at færdigudvikle app og organisation, og på sigt overdrage driften af både Håbet og Piff-Paff-Puff til borgerne i de enkelte områder, så hvert område selv ejer og varetager sin del.</p>
+    <div class="msg info">Uden Piff-Paff-Puff i fuld drift, er der intet fundament for Håbet. De to holdes bevidst adskilt: Piff-Paff-Puff er indsamlingen — Håbet er den sociale organisation, der modtager og bruger midlerne.</div>
+  </div>
+  <div class="card dark">
+    <span class="eyebrow">Om Håbet</span>
+    <h2 style="color:var(--white);font-size:21px;">Ingen sårbare skal stå alene</h2>
+    <p class="body">Håbet er stiftet ud fra en overbevisning om, at ingen sårbare mennesker skal stå alene, når livet føles uretfærdigt. Håbet opstår som en reaktion på systemets uligheder og manglende evne til at håndtere udsatte borgeres situationer — noget der ofte fører til traumer. Håbet vil forebygge dette gennem vejledning, nærvær og økonomisk håndsrækning.</p>
+    <p class="body">Håbet tilbyder blandt andet akutte boligløsninger til familier i akut bolignød — <b>Hytten</b>, <b>Tiny House</b>, og <b>Huset</b> (med lejlighed til daglig leder, kontor og terapiområde). Ansøgninger fra borgere i målgruppen behandles efter foreningens vedtægter, efter først-til-mølle-princippet.</p>
+    <p class="body"><b>Visionen:</b> at etablere 10–12 akuthuse i Danmark, som fungerer som landets sikkerhedsnet i beskyttelse mod traumer — forbeholdt dem der har bidraget til Håbets eksistens gennem Piff-Paff-Puff.</p>
+    <p class="body" style="font-size:12px;color:#B9C8B7;">Håbets første hus er 96% klar. Hovedafdelingen (HQ) er bygget og fysisk klar på Fyn.</p>
+    <div style="margin-top:14px;">CVR ${h.cvr} · <a href="mailto:${h.email}" style="color:#D9E3D8;">${h.email}</a> · <a href="${h.website}" target="_blank" style="color:#D9E3D8;">${h.website}</a></div>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Lanceringsstrategi</span>
+    <p>Håbet og Piff-Paff-Puff opstartes som pilotprojekt på Fyn. Når det bliver den succes, vi håber, er visionen at åbne flere afdelinger i de områder med størst efterspørgsel — indtil hele Danmark er dækket.</p>
+  </div>`;
+}
+
+/* ---------- KONTAKT ---------- */
+function kontaktHTML(){
+  const activeRegion = state.contactRegion || ALL_REGIONS[4].name; // default HQ Fyn
+  const r = ALL_REGIONS.find(x=>x.name===activeRegion);
+  const email = state.contacts[activeRegion] || "";
+  const p = state.settings.ppp, h = state.settings.haabet;
+  return `
+  <div class="card">
+    <span class="eyebrow">IVR · Telefonomstilling</span>
+    <h2 style="font-size:21px;">Ring til os</h2>
+    <p>Ring til hovednummeret <b class="mono">${p.phone}</b> og følg telefonomstillingen. Test og vælg blandt mulighederne for at komme igennem til den driftsansvarlige for dit område — med fokus på daglig drift og eventuelle problemer der opstår.</p>
+    <div class="msg info">Menuen giver adgang til de driftsansvarlige i alle 11 områder. Vælg dit område i menuen for at blive stillet direkte om.</div>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Kontaktpersoner pr. område</span>
+    <div class="subnav">${ALL_REGIONS.map(rr=>`<button data-cregion="${rr.name}" class="${activeRegion===rr.name?'active':''}">${rr.name}</button>`).join("")}</div>
+    <div class="region-tile ${r.hq?'hq':''}" style="max-width:420px;">
+      <div class="grp"><span>${r.group}</span>${r.hq?'<span class="hqtag">HQ</span>':''}</div>
+      <div class="name">${r.name}</div>
+      <div style="font-size:12.5px;color:#7a7566;margin-bottom:8px;">Postnr. ${r.pc}</div>
+      <div style="font-size:13.5px;">✉️ ${email ? `<a href="mailto:${email}">${email}</a>` : `<span style="color:#7a7566;">Ingen kontaktmail sat endnu — admin kan tilføje under Kontaktpersoner.</span>`}</div>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <span class="badge-org ppp">PIFF-PAFF-PUFF</span>
+      <h3 style="margin-top:8px;font-size:17px;">Om indsamlingen</h3>
+      <p style="font-size:13.5px;">📞 ${p.phone}<br>✉️ <a href="mailto:${p.email}">${p.email}</a><br>🔗 <a href="${p.website}" target="_blank">${p.website}</a><br>📘 <a href="${p.facebook}" target="_blank">Facebook</a></p>
+    </div>
+    <div class="card">
+      <span class="badge-org hb">HÅBET</span>
+      <h3 style="margin-top:8px;font-size:17px;">Om den sociale organisation</h3>
+      <p style="font-size:13.5px;">CVR ${h.cvr}<br>📞 ${h.phone}<br>✉️ <a href="mailto:${h.email}">${h.email}</a><br>🔗 <a href="${h.website}" target="_blank">${h.website}</a></p>
+    </div>
+  </div>
+  <div class="card">
+    <span class="eyebrow">QR-koder til marketingmateriale</span>
+    <div class="qr-box">
+      <div class="qr-item">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(h.website)}" alt="QR til formål og hensigt"/>
+        <div class="cap">Formål &amp; hensigt med projektet<br>(${h.website})</div>
+      </div>
+      <div class="qr-item">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(p.website)}" alt="QR til app/link"/>
+        <div class="cap">Tilmeld dig via appen<br>(${p.website})</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- INDSAMLING (public) ---------- */
+function indsamlingHTML(){
+  const active = state.members.filter(m=>m.status==="active");
+  const byRegion = {};
+  state.collections.forEach(c=>{ byRegion[c.region]=(byRegion[c.region]||0)+Number(c.amount||0); });
+  const total = state.collections.reduce((s,c)=>s+Number(c.amount||0),0);
+  const best = Object.entries(byRegion).sort((a,b)=>b[1]-a[1])[0];
+  const maxAmt = Math.max(1, ...Object.values(byRegion));
+  const sorted = [...ALL_REGIONS].sort((a,b)=> (byRegion[b.name]||0)-(byRegion[a.name]||0));
+  return `
+  <div class="stat-row">
+    <div class="stat"><div class="n">${total.toLocaleString('da-DK')} kr</div><div class="l">TOTAL INDSAMLET</div></div>
+    <div class="stat"><div class="n">${(byRegion["Fyn (Hovedafdeling)"]||0).toLocaleString('da-DK')} kr</div><div class="l">HOVEDAFDELING FYN</div></div>
+    <div class="stat"><div class="n">${active.length}</div><div class="l">AKTIVE BRUGERE</div></div>
+  </div>
+  <div class="card dark">
+    <span class="eyebrow">Løbende indsamling pr. område</span>
+    ${sorted.map(r=>{
+      const amt = byRegion[r.name]||0;
+      const pct = Math.max(2, Math.round(amt/maxAmt*100));
+      const cnt = active.filter(m=>m.region===r.name).length;
+      return `<div class="bar-row"><div class="head"><span>${r.name} <span style="opacity:.6;">· ${cnt} beholdere</span></span><b>${amt.toLocaleString('da-DK')} kr</b></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>`;
+    }).join("")}
+  </div>`;
+}
+
+/* ---------- ADMIN GATE + SHELL ---------- */
+function gateHTML(){
+  return `
+  <div class="gate">
+    <span class="eyebrow">Admin</span>
+    <h2 style="font-size:20px;margin-bottom:14px;">Log ind som administrator</h2>
+    <form id="gate-form">
+      <input required name="code" type="password" placeholder="Adgangskode"/>
+      <button class="btn" type="submit" style="width:100%;">Log ind</button>
+    </form>
+    <div class="locked-note">Prototype-adgangskode: <span class="mono">fyn2026</span> — kun til test.</div>
+  </div>`;
+}
+function adminHTML(){
+  const sub = state.adminSub;
+  const subs = [["oversigt","Oversigt"],["medlemmer","Medlemmer"],["fuldhaste","Fuld/Haste"],["kalender","Kalender"],["belob","Beløb"],["kontakt","Kontaktpersoner"],["org","Håbet & PPP"],["log","Besked-log"],["eksport","Eksport/Backup"]];
+  return `
+  <div class="subnav">
+    ${subs.map(([id,l])=>`<button data-admin="${id}" class="${sub===id?'active':''}">${l}</button>`).join("")}
+    <button data-admin="logout" style="margin-left:auto;color:#A23B2E;">Log ud</button>
+  </div>
+  ${({
+    oversigt: adminOversigt, medlemmer: adminMedlemmer, fuldhaste: adminFuldHaste,
+    kalender: adminKalender, belob: adminBelob, kontakt: adminKontakt,
+    org: adminOrg, log: adminLog, eksport: adminEksport
+  })[sub]()}
+  `;
+}
+function adminOversigt(){
+  const active = state.members.filter(m=>m.status==="active");
+  const totalAmount = state.collections.reduce((s,c)=>s+Number(c.amount||0),0);
+  const pending = state.fullreports.filter(f=>!f.handled).length;
+  return `
+  <div class="stat-row">
+    <div class="stat"><div class="n">${active.length}</div><div class="l">AKTIVE MEDLEMMER</div></div>
+    <div class="stat"><div class="n">${state.members.length-active.length}</div><div class="l">AFMELDTE</div></div>
+    <div class="stat"><div class="n">${totalAmount.toLocaleString('da-DK')} kr</div><div class="l">SAMLET INDSAMLET</div></div>
+    <div class="stat"><div class="n">${pending}</div><div class="l">ÅBNE FULD/HASTE-SAGER</div></div>
+  </div>
+  <div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Medlemmer pr. område</h3>
+  <div class="regions">${ALL_REGIONS.map(r=>{
+    const c = active.filter(m=>m.region===r.name).length;
+    return `<div class="region-tile ${r.hq?'hq':''}"><div class="grp"><span>${r.group}</span>${r.hq?'<span class="hqtag">HQ</span>':''}</div><div class="name">${r.name}</div><div class="count">${c}<span>medlemmer</span></div></div>`;
+  }).join("")}</div></div>`;
+}
+function adminMedlemmer(){
+  const rows = [...state.members].sort((a,b)=> new Date(b.signupDate)-new Date(a.signupDate));
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Alle medlemmer (${rows.length})</h3>
+  <div style="overflow-x:auto;"><table>
+  <thead><tr><th>Nr.</th><th>Navn</th><th>Type</th><th>Opbevaring</th><th>Område</th><th>Adresse</th><th>Status</th><th>Dato</th></tr></thead>
+  <tbody>${rows.map(m=>`<tr>
+    <td class="mono">${m.number}</td><td>${m.name}</td><td>${m.containerType||"—"}</td><td>${m.storageMode==='egen'?'Egen (sække)':'Beholder'}</td>
+    <td>${m.region}</td><td>${m.street}, ${m.postal} ${m.city}</td>
+    <td><span class="pill ${m.status}">${m.status==="active"?"Aktiv":"Afmeldt"}</span></td>
+    <td class="mono" style="font-size:11px;">${new Date(m.signupDate).toLocaleDateString('da-DK')}</td>
+  </tr>`).join("") || `<tr><td colspan="8" style="color:#7a7566;">Ingen medlemmer endnu.</td></tr>`}</tbody>
+  </table></div></div>`;
+}
+function adminFuldHaste(){
+  const rows = [...state.fullreports].sort((a,b)=> new Date(b.date)-new Date(a.date));
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Meldinger om fuld beholder / hasteafhentning</h3>
+  <table><thead><tr><th>Dato</th><th>Medlem</th><th>Område</th><th>Type</th><th>Note</th><th>Status</th><th></th></tr></thead>
+  <tbody>${rows.map(f=>`<tr>
+    <td class="mono" style="font-size:11px;">${new Date(f.date).toLocaleDateString('da-DK')}</td>
+    <td class="mono">${f.memberNumber}</td><td>${f.region}</td>
+    <td>${f.type==='haste'?'Haste (maks 3 dage)':'Fuld'}</td><td>${f.note||"—"}</td>
+    <td><span class="pill ${f.handled?'active':'pending'}">${f.handled?'Klaret':'Åben'}</span></td>
+    <td>${f.handled?"":`<button class="btn small ghost" data-handle="${f.id}">Marker klaret</button>`}</td>
+  </tr>`).join("") || `<tr><td colspan="7" style="color:#7a7566;">Ingen meldinger endnu.</td></tr>`}</tbody></table></div>`;
+}
+function adminKalender(){
+  const events = [...state.calendar].sort((a,b)=> new Date(a.date)-new Date(b.date));
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Tilføj tømningsdato</h3>
+  <form id="cal-form"><div class="row2">
+    <div><label>Område</label><select name="region">${ALL_REGIONS.map(r=>`<option value="${r.name}">${r.name}</option>`).join("")}</select></div>
+    <div><label>Dato</label><input required type="date" name="date"/></div>
+  </div><label>Note</label><input name="note" placeholder="fx: tømning, ruteinfo"/>
+  <button class="btn" type="submit">Tilføj til kalender</button></form></div>
+  <div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Kommende og tidligere datoer</h3>
+  <table><thead><tr><th>Dato</th><th>Område</th><th>Note</th><th></th></tr></thead><tbody>
+  ${events.map(e=>`<tr><td class="mono">${new Date(e.date).toLocaleDateString('da-DK')}</td><td>${e.region}</td><td>${e.note||"—"}</td>
+  <td><button data-del-cal="${e.id}" class="btn small ghost">Fjern</button></td></tr>`).join("") || `<tr><td colspan="4" style="color:#7a7566;">Ingen datoer endnu.</td></tr>`}
+  </tbody></table></div>`;
+}
+function adminBelob(){
+  const rows = [...state.collections].sort((a,b)=> new Date(b.date)-new Date(a.date));
+  const byRegion = {}; state.collections.forEach(c=>{ byRegion[c.region]=(byRegion[c.region]||0)+Number(c.amount||0); });
+  const total = state.collections.reduce((s,c)=>s+Number(c.amount||0),0);
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Indtast indsamlet beløb</h3>
+  <form id="belob-form"><div class="row2">
+    <div><label>Område</label><select name="region">${ALL_REGIONS.map(r=>`<option value="${r.name}">${r.name}</option>`).join("")}</select></div>
+    <div><label>Beløb (kr)</label><input required type="number" step="0.01" min="0" name="amount" placeholder="1250"/></div>
+  </div><div class="row2">
+    <div><label>Dato</label><input required type="date" name="date"/></div>
+    <div><label>Note</label><input name="note" placeholder="fx: afregning uge 30"/></div>
+  </div><button class="btn" type="submit">Registrér beløb</button></form></div>
+  <div class="card"><h3 style="font-size:16px;">Samlet: <span class="mono">${total.toLocaleString('da-DK')} kr</span></h3>
+  <div class="regions" style="margin:14px 0;">${ALL_REGIONS.map(r=>`<div class="region-tile ${r.hq?'hq':''}"><div class="grp">${r.group}</div><div class="name">${r.name}</div><div class="count">${(byRegion[r.name]||0).toLocaleString('da-DK')}<span>kr</span></div></div>`).join("")}</div>
+  <table><thead><tr><th>Dato</th><th>Område</th><th>Beløb</th><th>Note</th></tr></thead><tbody>
+  ${rows.map(c=>`<tr><td class="mono">${new Date(c.date).toLocaleDateString('da-DK')}</td><td>${c.region}</td><td class="mono">${Number(c.amount).toLocaleString('da-DK')} kr</td><td>${c.note||"—"}</td></tr>`).join("") || `<tr><td colspan="4" style="color:#7a7566;">Intet registreret endnu.</td></tr>`}
+  </tbody></table></div>`;
+}
+function adminKontakt(){
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Kontakt-mail pr. område</h3>
+  <p style="margin-top:0;">Modtager besked når nogen tilmelder/afmelder/melder fuld i området. Bruges også til IVR-omstillingen.</p>
+  <form id="contact-form">
+  ${ALL_REGIONS.map(r=>`<label>${r.name}</label><input name="c_${r.name}" type="email" value="${state.contacts[r.name]||""}" placeholder="kontakt@omraade.dk"/>`).join("")}
+  <button class="btn" type="submit">Gem kontaktoplysninger</button></form></div>`;
+}
+function adminOrg(){
+  const p = state.settings.ppp, h = state.settings.haabet;
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Piff-Paff-Puff — organisationsoplysninger</h3>
+  <form id="ppp-form">
+  <div class="row2"><div><label>Navn</label><input name="name" value="${p.name}"/></div><div><label>CVR-nr.</label><input name="cvr" value="${p.cvr}" placeholder="Indsæt CVR"/></div></div>
+  <div class="row2"><div><label>Telefon</label><input name="phone" value="${p.phone}"/></div><div><label>E-mail</label><input name="email" value="${p.email}"/></div></div>
+  <div class="row2"><div><label>Hjemmeside</label><input name="website" value="${p.website}"/></div><div><label>Facebook</label><input name="facebook" value="${p.facebook}"/></div></div>
+  <button class="btn" type="submit">Gem Piff-Paff-Puff oplysninger</button></form></div>
+  <div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Håbet — organisationsoplysninger (holdes adskilt fra Piff-Paff-Puff)</h3>
+  <form id="haabet-form">
+  <div class="row2"><div><label>Navn</label><input name="name" value="${h.name}"/></div><div><label>CVR-nr.</label><input name="cvr" value="${h.cvr}"/></div></div>
+  <div class="row2"><div><label>Telefon</label><input name="phone" value="${h.phone}"/></div><div><label>E-mail</label><input name="email" value="${h.email}"/></div></div>
+  <label>Hjemmeside</label><input name="website" value="${h.website}"/>
+  <button class="btn" type="submit">Gem Håbet oplysninger</button></form></div>`;
+}
+function adminLog(){
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Besked-log (simuleret udsendelse)</h3>
+  <p style="margin-top:0;">Da prototypen ikke er koblet til en rigtig mailserver, logges beskeder her i stedet — inkl. tilmelding, afmelding, adresseændring, fuld/haste-meldinger.</p>
+  <div class="loglist">${state.log.map(l=>`<div class="logitem"><div class="to">TIL: ${l.to||"(ingen kontaktmail sat for området)"} · ${new Date(l.date).toLocaleString('da-DK')}</div><b>${l.subject}</b><div>${l.body}</div></div>`).join("") || `<p style="color:#7a7566;">Ingen beskeder endnu.</p>`}</div></div>`;
+}
+function adminEksport(){
+  return `<div class="card"><h3 style="font-size:16px;margin-bottom:12px;">Eksportér &amp; send input/output videre</h3>
+  <p>Send alle appens funktioner (medlemmer, kalender, beløb, fuld/haste-sager, besked-log) videre som samlet eksport — til brug for backup eller videresendelse til andre.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn" id="btn-download-json">Download fuld backup (.json)</button>
+    <button class="btn ghost" id="btn-copy-summary">Kopiér samlet resumé til udklipsholder</button>
+  </div>
+  <div id="export-result"></div>
+  </div>
+  <div class="card"><h3 style="font-size:16px;margin-bottom:8px;">Automatisk backup</h3>
+  <p>Alle data gemmes løbende i den delte database, så intet går tabt ved lukning af appen. For en fuldautomatisk, tilbagevendende backup til ekstern server (fx jeres NAS) skal denne eksportfunktion kobles til en rigtig serverrutine, når appen går i produktion. Indtil da: download en backup jævnligt via knappen ovenfor.</p>
+  <div class="msg info">Sidste manuelle backup-eksport: ${state.lastBackup ? new Date(state.lastBackup).toLocaleString('da-DK') : "endnu ikke taget"}</div>
+  </div>`;
+}
+
+/* ---------- Events ---------- */
+function bindEvents(){
+  root.querySelectorAll("[data-tab]").forEach(el=> el.addEventListener("click", (e)=>{ e.preventDefault(); setTab(el.dataset.tab); }));
+  root.querySelectorAll("[data-shortcut]").forEach(el=> el.addEventListener("click", ()=>{
+    const [tab,sub] = el.dataset.shortcut.split(":");
+    state.tab = tab; if(sub) state.beholderSub = sub;
+    render(); window.scrollTo(0,0);
+  }));
+  root.querySelectorAll("[data-bsub]").forEach(el=> el.addEventListener("click", ()=>{ state.beholderSub = el.dataset.bsub; render(); }));
+  root.querySelectorAll("[data-cregion]").forEach(el=> el.addEventListener("click", ()=>{ state.contactRegion = el.dataset.cregion; render(); }));
+  root.querySelectorAll("[data-admin]").forEach(el=> el.addEventListener("click", ()=>{
+    if(el.dataset.admin==="logout"){ state.adminUnlocked=false; setTab("forside"); return; }
+    state.adminSub = el.dataset.admin; render();
+  }));
+
+  const postalInput = root.querySelector('input[name="postal"]');
+  if(postalInput){
+    postalInput.addEventListener("input", ()=>{
+      const r = getRegion(postalInput.value);
+      const prev = root.querySelector("#region-preview");
+      if(prev) prev.textContent = r ? `Område: ${r.group} — ${r.name}` : (postalInput.value.length===4 ? "Postnummer ikke genkendt. Tjek venligst nummeret." : "");
+    });
+  }
+  const calFilter = root.querySelector("#cal-region-filter");
+  if(calFilter) calFilter.addEventListener("change", ()=>{ state.calFilter = calFilter.value; render(); });
+
+  bindForm("#signup-form", handleSignup);
+  bindForm("#cancel-form", handleCancel);
+  bindForm("#lookup-form", handleLookup);
+  bindForm("#move-form", handleMove);
+  bindForm("#nonr-form", handleNoNr);
+  const fullForm = root.querySelector("#full-form");
+  if(fullForm) fullForm.addEventListener("submit", handleFullHaste);
+
+  const gateForm = root.querySelector("#gate-form");
+  if(gateForm) gateForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const code = new FormData(gateForm).get("code");
+    if(code==="fyn2026"){ state.adminUnlocked=true; state.adminSub="oversigt"; render(); }
+    else gateForm.insertAdjacentHTML("afterend", `<div class="msg err">Forkert adgangskode.</div>`);
+  });
+
+  const calForm = root.querySelector("#cal-form");
+  if(calForm) calForm.addEventListener("submit", async (e)=>{
+    e.preventDefault(); const fd = new FormData(calForm);
+    state.calendar.push({id:uid(), region:fd.get("region"), date:fd.get("date"), note:fd.get("note")});
+    await sset(SKEY.calendar, state.calendar); render();
+  });
+  root.querySelectorAll("[data-del-cal]").forEach(el=> el.addEventListener("click", async ()=>{
+    state.calendar = state.calendar.filter(e=>e.id!==el.dataset.delCal);
+    await sset(SKEY.calendar, state.calendar); render();
+  }));
+
+  const belobForm = root.querySelector("#belob-form");
+  if(belobForm) belobForm.addEventListener("submit", async (e)=>{
+    e.preventDefault(); const fd = new FormData(belobForm);
+    state.collections.push({id:uid(), region:fd.get("region"), amount:fd.get("amount"), date:fd.get("date"), note:fd.get("note")});
+    await sset(SKEY.collections, state.collections); render();
+  });
+
+  const contactForm = root.querySelector("#contact-form");
+  if(contactForm) contactForm.addEventListener("submit", async (e)=>{
+    e.preventDefault(); const fd = new FormData(contactForm);
+    ALL_REGIONS.forEach(r=>{ state.contacts[r.name] = fd.get("c_"+r.name)||""; });
+    await sset(SKEY.contacts, state.contacts); render();
+  });
+
+  const pppForm = root.querySelector("#ppp-form");
+  if(pppForm) pppForm.addEventListener("submit", async (e)=>{
+    e.preventDefault(); const fd = new FormData(pppForm);
+    state.settings.ppp = {name:fd.get("name"),cvr:fd.get("cvr"),phone:fd.get("phone"),email:fd.get("email"),website:fd.get("website"),facebook:fd.get("facebook")};
+    await sset(SKEY.settings, state.settings); render();
+  });
+  const haabetForm = root.querySelector("#haabet-form");
+  if(haabetForm) haabetForm.addEventListener("submit", async (e)=>{
+    e.preventDefault(); const fd = new FormData(haabetForm);
+    state.settings.haabet = {name:fd.get("name"),cvr:fd.get("cvr"),phone:fd.get("phone"),email:fd.get("email"),website:fd.get("website")};
+    await sset(SKEY.settings, state.settings); render();
+  });
+
+  root.querySelectorAll("[data-handle]").forEach(el=> el.addEventListener("click", async ()=>{
+    const rep = state.fullreports.find(f=>f.id===el.dataset.handle);
+    if(rep) rep.handled = true;
+    await sset(SKEY.fullreports, state.fullreports); render();
+  }));
+
+  const dlBtn = root.querySelector("#btn-download-json");
+  if(dlBtn) dlBtn.addEventListener("click", ()=>{
+    const backup = {exportedAt:new Date().toISOString(), members:state.members, contacts:state.contacts, calendar:state.calendar, collections:state.collections, log:state.log, fullreports:state.fullreports, settings:state.settings};
+    const blob = new Blob([JSON.stringify(backup,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href=url; a.download = `piff-paff-puff-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    state.lastBackup = new Date().toISOString();
+    root.querySelector("#export-result").innerHTML = `<div class="msg ok">Backup downloadet.</div>`;
+  });
+  const copyBtn = root.querySelector("#btn-copy-summary");
+  if(copyBtn) copyBtn.addEventListener("click", async ()=>{
+    const active = state.members.filter(m=>m.status==="active").length;
+    const total = state.collections.reduce((s,c)=>s+Number(c.amount||0),0);
+    const summary = `Piff-Paff-Puff — samlet resumé (${new Date().toLocaleString('da-DK')})\nAktive medlemmer: ${active}\nSamlet indsamlet: ${total.toLocaleString('da-DK')} kr\nÅbne fuld/haste-sager: ${state.fullreports.filter(f=>!f.handled).length}\nSeneste beskeder:\n` + state.log.slice(0,10).map(l=>`- [${new Date(l.date).toLocaleDateString('da-DK')}] ${l.subject} → ${l.to||'(ingen mail sat)'}`).join("\n");
+    try{ await navigator.clipboard.writeText(summary); root.querySelector("#export-result").innerHTML = `<div class="msg ok">Resumé kopieret — klar til at sætte ind i en mail eller besked. (Simuleret videresendelse, da appen endnu ikke er koblet til en mailserver.)</div>`; }
+    catch(e){ root.querySelector("#export-result").innerHTML = `<div class="msg err">Kunne ikke kopiere automatisk. Prøv igen.</div>`; }
+  });
+}
+
+function bindForm(sel, handler){ const f = root.querySelector(sel); if(f) f.addEventListener("submit", handler); }
+
+async function handleSignup(e){
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const region = getRegion(fd.get("postal"));
+  const resultDiv = root.querySelector("#signup-result");
+  if(!region){ resultDiv.innerHTML = `<div class="msg err">Postnummeret blev ikke genkendt. Tjek at det er korrekt.</div>`; return; }
+  const number = await nextMemberNumber(region.name);
+  const member = {
+    id:uid(), number, status:"active", signupDate:new Date().toISOString(),
+    name:fd.get("name"), phone:fd.get("phone"), email:fd.get("email"),
+    street:fd.get("street"), postal:fd.get("postal"), city:fd.get("city"),
+    region:region.name, regionGroup:region.group,
+    containerType:fd.get("ctype")||"privat", storageMode:fd.get("storage")||"beholder",
+  };
+  state.members.push(member); await sset(SKEY.members, state.members);
+  const contactEmail = state.contacts[region.name];
+  await addLog(contactEmail, `Ny tilmelding — ${region.name}`,
+    `${member.name} (${member.number}) er tilmeldt på ${member.street}, ${member.postal} ${member.city}. Opbevaring: ${member.storageMode==='egen'?'egen (sække ved vejen)':'fysisk beholder'}. Bestil/aflever beholder til denne adresse.`);
+  resultDiv.innerHTML = `<div class="receipt"><h3>Tilmelding bekræftet</h3><div class="num">${member.number}</div>
+    <div class="line"><span>Navn</span><b>${member.name}</b></div>
+    <div class="line"><span>Område</span><b>${member.region}</b></div>
+    <div class="line"><span>Opbevaring</span><b>${member.storageMode==='egen'?'Egen (sække)':'Beholder'}</b></div>
+    <div class="line"><span>Adresse</span><b>${member.street}, ${member.postal} ${member.city}</b></div>
+    <div class="line"><span>Dato</span><b>${new Date(member.signupDate).toLocaleDateString('da-DK')}</b></div></div>
+    <div class="msg ok">Besked om beholder-udlevering er registreret til det tilknyttede område.</div>`;
+  e.target.reset(); const rp = root.querySelector("#region-preview"); if(rp) rp.textContent="";
+}
+async function handleCancel(e){
+  e.preventDefault(); const fd = new FormData(e.target);
+  const resultDiv = root.querySelector("#cancel-result");
+  const member = findMember(fd.get("lookup"));
+  if(!member){ resultDiv.innerHTML = `<div class="msg err">Intet medlem fundet.</div>`; return; }
+  if(member.status==="inactive"){ resultDiv.innerHTML = `<div class="msg err">${member.name} er allerede afmeldt.</div>`; return; }
+  member.status="inactive"; member.cancelDate=new Date().toISOString();
+  await sset(SKEY.members, state.members);
+  await addLog(state.contacts[member.region], `Afmelding — ${member.region}`,
+    `${member.name} (${member.number}) er afmeldt. Sørg for afhentning af beholder på ${member.street}, ${member.postal} ${member.city}.`);
+  resultDiv.innerHTML = `<div class="msg ok">${member.name} (${member.number}) er afmeldt. Besked om afhentning er registreret.</div>`;
+  e.target.reset();
+}
+function handleLookup(e){
+  e.preventDefault(); const fd = new FormData(e.target);
+  const resultDiv = root.querySelector("#lookup-result");
+  const member = findMember(fd.get("lookup"));
+  if(!member){ resultDiv.innerHTML = `<div class="msg err">Intet medlem fundet.</div>`; return; }
+  resultDiv.innerHTML = `<div class="receipt"><h3>Beholderstatus</h3><div class="num">${member.number}</div>
+    <div class="line"><span>Navn</span><b>${member.name}</b></div>
+    <div class="line"><span>Type</span><b>${member.containerType}</b></div>
+    <div class="line"><span>Opbevaring</span><b>${member.storageMode==='egen'?'Egen (sække)':'Beholder'}</b></div>
+    <div class="line"><span>Område</span><b>${member.region}</b></div>
+    <div class="line"><span>Status</span><b>${member.status==="active"?"Aktiv":"Afmeldt"}</b></div>
+    <div class="line"><span>Adresse</span><b>${member.street}, ${member.postal} ${member.city}</b></div>
+    <div class="line"><span>Tilmeldt</span><b>${new Date(member.signupDate).toLocaleDateString('da-DK')}</b></div></div>`;
+}
+async function handleMove(e){
+  e.preventDefault(); const fd = new FormData(e.target);
+  const resultDiv = root.querySelector("#move-result");
+  const member = findMember(fd.get("lookup"));
+  if(!member){ resultDiv.innerHTML = `<div class="msg err">Intet medlem fundet.</div>`; return; }
+  const region = getRegion(fd.get("postal"));
+  if(!region){ resultDiv.innerHTML = `<div class="msg err">Postnummeret blev ikke genkendt.</div>`; return; }
+  const oldRegion = member.region, oldAddr = `${member.street}, ${member.postal} ${member.city}`;
+  member.street = fd.get("street"); member.postal = fd.get("postal"); member.city = fd.get("city");
+  member.region = region.name; member.regionGroup = region.group;
+  await sset(SKEY.members, state.members);
+  await addLog(state.contacts[oldRegion], `Adresseflytning ud af ${oldRegion}`, `${member.name} (${member.number}) er flyttet fra ${oldAddr}.`);
+  await addLog(state.contacts[region.name], `Adresseflytning ind i ${region.name}`, `${member.name} (${member.number}) er flyttet til ${member.street}, ${member.postal} ${member.city}. Beholder skal flyttes/udleveres.`);
+  resultDiv.innerHTML = `<div class="msg ok">Adresse opdateret. Nyt område: ${member.region}.</div>`;
+  e.target.reset();
+}
+async function handleFullHaste(e){
+  e.preventDefault();
+  const kind = e.submitter && e.submitter.dataset.kind ? e.submitter.dataset.kind : "full";
+  const fd = new FormData(e.target);
+  const resultDiv = root.querySelector("#full-result");
+  const member = findMember(fd.get("lookup"));
+  if(!member){ resultDiv.innerHTML = `<div class="msg err">Intet medlem fundet.</div>`; return; }
+  const report = {id:uid(), memberNumber:member.number, region:member.region, type:kind, note:fd.get("note"), date:new Date().toISOString(), handled:false};
+  state.fullreports.push(report); await sset(SKEY.fullreports, state.fullreports);
+  await addLog(state.contacts[member.region], kind==="haste" ? `Hasteafhentning bestilt — ${member.region}` : `Beholder meldt fuld — ${member.region}`,
+    `${member.name} (${member.number}) på ${member.street}, ${member.postal} ${member.city} har ${kind==="haste"?"bestilt hasteafhentning (afhentes inden for maks. 3 dage)":"meldt beholderen fuld"}. ${fd.get("note")||""}`);
+  resultDiv.innerHTML = kind==="haste"
+    ? `<div class="msg ok">Hasteafhentning bestilt for ${member.name}. Din beholder hentes inden for maks. 3 dage.</div>`
+    : `<div class="msg ok">Beholder meldt fuld for ${member.name}. Den tages med på næste planlagte tømning, medmindre du bestiller hasteafhentning.</div>`;
+  e.target.reset();
+}
+async function handleNoNr(e){
+  e.preventDefault(); const fd = new FormData(e.target);
+  const region = getRegion(fd.get("postal"));
+  const resultDiv = root.querySelector("#nonr-result");
+  if(!region){ resultDiv.innerHTML = `<div class="msg err">Postnummeret blev ikke genkendt.</div>`; return; }
+  const number = await nextMemberNumber(region.name);
+  const member = {
+    id:uid(), number, status:"active", signupDate:new Date().toISOString(),
+    name:fd.get("name"), phone:fd.get("phone"), email:fd.get("email"),
+    street:fd.get("street"), postal:fd.get("postal"), city:fd.get("city"),
+    region:region.name, regionGroup:region.group, containerType:"andet", storageMode:"egen",
+  };
+  state.members.push(member); await sset(SKEY.members, state.members);
+  await addLog(state.contacts[region.name], `Bruger-nr. bestilt uden beholder — ${region.name}`,
+    `${member.name} (${member.number}) har fået tildelt bruger-/medlemsnummer uden fysisk beholder. Bruger egen opbevaring — sække sættes ved vejen på tømningsdag.`);
+  resultDiv.innerHTML = `<div class="receipt"><h3>Nummer tildelt</h3><div class="num">${member.number}</div>
+    <div class="line"><span>Navn</span><b>${member.name}</b></div><div class="line"><span>Område</span><b>${member.region}</b></div>
+    <div class="line"><span>Opbevaring</span><b>Egen (sække ved vejen)</b></div></div>
+    <div class="msg ok">Du kan nu sætte sække ved vejen på jeres faste tømningsdag.</div>`;
+  e.target.reset();
+}
+
+loadAll();
+</script>
+</body>
+</html>
